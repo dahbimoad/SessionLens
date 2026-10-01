@@ -1,0 +1,14 @@
+# Build output
+bin/
+obj/
+
+# Release artefacts
+publish/
+dist/
+
+# IDE
+.vs/
+.idea/
+*.user
+*.suo
+*.userprefs
