@@ -4,9 +4,9 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using SessionRecorder.Interop;
+using SessionLens.Interop;
 
-namespace SessionRecorder.Services.Recording;
+namespace SessionLens.Services.Recording;
 
 internal sealed record RecordingSummary(
     DateTimeOffset StartedAt, DateTimeOffset StoppedAt, string ChromeVersion, string RecorderVersion,
@@ -33,7 +33,7 @@ internal static class RecordingArchive
     /// <summary>Returns the path of the written zip.</summary>
     public static string Write(RecordingContents contents)
     {
-        var path = UniquePath(KnownFolders.Downloads, $"session-recording_{contents.Summary.StartedAt:yyyy-MM-dd_HH-mm-ss}");
+        var path = UniquePath(KnownFolders.Downloads, $"sessionlens_{contents.Summary.StartedAt:yyyy-MM-dd_HH-mm-ss}");
         // Written under a temporary name so a failure never leaves a truncated zip that looks complete.
         var partialPath = path + ".partial";
         try

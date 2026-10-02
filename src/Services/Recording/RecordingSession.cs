@@ -1,10 +1,10 @@
 using System.Reflection;
 using System.Text.Json.Nodes;
 using Microsoft.Playwright;
-using SessionRecorder.Services.Logging;
-using SessionRecorder.Services.Platform;
+using SessionLens.Services.Logging;
+using SessionLens.Services.Platform;
 
-namespace SessionRecorder.Services.Recording;
+namespace SessionLens.Services.Recording;
 
 internal sealed record RecordingStats(DateTimeOffset StartedAt, int Steps, int Requests, int ConsoleEntries, int Warnings);
 
@@ -15,7 +15,7 @@ internal sealed record RecordingStats(DateTimeOffset StartedAt, int Steps, int R
 /// </summary>
 internal sealed class RecordingSession : IAsyncDisposable
 {
-    private const string ReportBinding = "__sessionRecorderReport";
+    private const string ReportBinding = "__sessionLensReport";
     private static readonly TimeSpan DrainTimeout = TimeSpan.FromSeconds(15);
     private static readonly string RecorderVersion =
         Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "unknown";
@@ -111,6 +111,9 @@ internal sealed class RecordingSession : IAsyncDisposable
             case "settled":
                 var index = _steps.Settle(stepKey, report["domAfter"]!.GetValue<string>());
                 await CaptureScreenshotAsync(index, source.Page);
+                break;
+            case "changes":
+                _steps.AddChanges(stepKey, report["changes"]!.AsArray(), report["dropped"]!.GetValue<int>());
                 break;
             default:
                 throw new InvalidOperationException($"Unknown recorder report type '{report["type"]}'.");

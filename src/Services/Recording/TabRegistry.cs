@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace SessionRecorder.Services.Recording;
+namespace SessionLens.Services.Recording;
 
 /// <summary>Numbers tabs 1, 2, 3... in the order they are first seen.</summary>
 internal sealed class TabRegistry

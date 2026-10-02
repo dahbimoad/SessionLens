@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace SessionRecorder.Services.Recording;
+namespace SessionLens.Services.Recording;
 
 internal sealed record CapturedResponse(int Status, string StatusText, string HttpVersion, IReadOnlyList<Header> Headers);
 

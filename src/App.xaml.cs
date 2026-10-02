@@ -1,10 +1,10 @@
 using System.Windows;
 using System.Windows.Threading;
-using SessionRecorder.Services.Logging;
-using SessionRecorder.Services.Platform;
-using SessionRecorder.Views;
+using SessionLens.Services.Logging;
+using SessionLens.Services.Platform;
+using SessionLens.Views;
 
-namespace SessionRecorder;
+namespace SessionLens;
 
 public partial class App : Application
 {
@@ -13,7 +13,7 @@ public partial class App : Application
         base.OnStartup(e);
 
         AppPaths.EnsureCreated();
-        AppLog.Info($"Session Recorder starting. os={Environment.OSVersion.VersionString} runtime={Environment.Version} pid={Environment.ProcessId}");
+        AppLog.Info($"SessionLens starting. os={Environment.OSVersion.VersionString} runtime={Environment.Version} pid={Environment.ProcessId}");
 
         DispatcherUnhandledException += OnDispatcherException;
         AppDomain.CurrentDomain.UnhandledException += OnDomainException;
@@ -41,7 +41,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
-        AppLog.Info($"Session Recorder exiting. exitCode={e.ApplicationExitCode}");
+        AppLog.Info($"SessionLens exiting. exitCode={e.ApplicationExitCode}");
         base.OnExit(e);
     }
 }

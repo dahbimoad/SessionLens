@@ -1,20 +1,20 @@
-; Inno Setup script for Session Recorder.
+; Inno Setup script for SessionLens.
 ; Build with:  .\scripts\build-installer.ps1      (publishes, then compiles this)
 ;
 ; PER-USER install (PrivilegesRequired=lowest, under %LocalAppData%\Programs), so a
 ; non-technical user never sees an admin prompt, and the recorded Chrome runs as them.
 
-#define AppName        "Session Recorder"
-#define AppVersion     "1.1.0"
+#define AppName        "SessionLens"
+#define AppVersion     "1.0.0"
 #define AppPublisher   "iSoutien"
 #define AppCopyright   "Copyright (c) 2026 Moad Dahbi"
-#define AppExeName     "SessionRecorder.exe"
+#define AppExeName     "SessionLens.exe"
 ; Derived from AppVersion so bumping the version cannot leave a stale icon name.
-#define AppIconName    "SessionRecorder-" + AppVersion + ".ico"
+#define AppIconName    "SessionLens-" + AppVersion + ".ico"
 #define SourceDir      "..\publish"
 
 [Setup]
-AppId={{3E8A5C21-7B4D-4F96-A1C3-9D2E6F0B7A58}
+AppId={{9A8D8056-C3FA-4904-8557-6BF79DC61D61}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
@@ -26,7 +26,7 @@ VersionInfoCopyright={#AppCopyright}
 VersionInfoProductName={#AppName}
 VersionInfoDescription={#AppName} Setup
 
-DefaultDirName={autopf}\SessionRecorder
+DefaultDirName={autopf}\SessionLens
 DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 DisableDirPage=auto
@@ -36,8 +36,8 @@ PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 
 OutputDir=..\dist
-OutputBaseFilename=SessionRecorder-Setup-{#AppVersion}
-SetupIconFile=..\src\Assets\session-recorder.ico
+OutputBaseFilename=SessionLens-Setup-{#AppVersion}
+SetupIconFile=..\src\Assets\sessionlens.ico
 UninstallDisplayIcon={app}\{#AppIconName}
 WizardStyle=modern
 
@@ -62,7 +62,7 @@ Name: "desktopicon"; Description: "Create a &desktop shortcut"; GroupDescription
 ; The whole self-contained publish folder, including the hidden .playwright driver folder.
 Source: "{#SourceDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; A versioned path prevents Explorer from reusing a cached icon from an older release.
-Source: "..\src\Assets\session-recorder.ico"; DestDir: "{app}"; DestName: "{#AppIconName}"; Flags: ignoreversion
+Source: "..\src\Assets\sessionlens.ico"; DestDir: "{app}"; DestName: "{#AppIconName}"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"; IconFilename: "{app}\{#AppIconName}"
@@ -77,29 +77,29 @@ Type: filesandordirs; Name: "{app}"
 [Code]
 // The app runs the Playwright driver (node.exe from {app}\.playwright) as a child
 // process; both lock files under {app}. /T ends the whole tree.
-procedure StopSessionRecorder;
+procedure StopSessionLens;
 var
   ResultCode: Integer;
 begin
-  Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /T /IM SessionRecorder.exe', '',
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /T /IM SessionLens.exe', '',
        SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Sleep(1500);
 end;
 
 function PrepareToInstall(var NeedsRestart: Boolean): String;
 begin
-  StopSessionRecorder;
+  StopSessionLens;
   Result := '';
 end;
 
 function InitializeUninstall(): Boolean;
 begin
-  StopSessionRecorder;
+  StopSessionLens;
   Result := True;
 end;
 
 // Uninstall leaves nothing behind: the log and the recording browser's profile (which
-// holds the site logins) live in %LocalAppData%\SessionRecorder. Recordings already
+// holds the site logins) live in %LocalAppData%\SessionLens. Recordings already
 // saved in Downloads belong to the user and are kept.
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var
@@ -107,7 +107,7 @@ var
 begin
   if CurUninstallStep = usPostUninstall then
   begin
-    DataDir := ExpandConstant('{localappdata}\SessionRecorder');
+    DataDir := ExpandConstant('{localappdata}\SessionLens');
     if DirExists(DataDir) then
       DelTree(DataDir, True, True, True);
   end;

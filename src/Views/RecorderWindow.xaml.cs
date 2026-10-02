@@ -6,10 +6,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Microsoft.Playwright;
-using SessionRecorder.Services.Logging;
-using SessionRecorder.Services.Recording;
+using SessionLens.Services.Logging;
+using SessionLens.Services.Recording;
 
-namespace SessionRecorder.Views;
+namespace SessionLens.Views;
 
 public partial class RecorderWindow : Window
 {

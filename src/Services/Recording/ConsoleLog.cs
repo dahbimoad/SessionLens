@@ -1,6 +1,6 @@
 using Microsoft.Playwright;
 
-namespace SessionRecorder.Services.Recording;
+namespace SessionLens.Services.Recording;
 
 internal sealed record ConsoleEntry(
     DateTimeOffset At, int? Tab, int AfterStep, string Source, string Level, string Text, string? Location);

@@ -1,8 +1,8 @@
 using System.IO;
 using System.Text;
-using SessionRecorder.Services.Platform;
+using SessionLens.Services.Platform;
 
-namespace SessionRecorder.Services.Logging;
+namespace SessionLens.Services.Logging;
 
 /// <summary>
 /// Small append-only log. Deliberately dumb: no framework, no sinks, no async.

@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
-namespace SessionRecorder.Services.Recording;
+namespace SessionLens.Services.Recording;
 
 /// <summary>
 /// Removes credentials and session secrets from what goes into network.har, so a recording

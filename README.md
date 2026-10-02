@@ -1,4 +1,4 @@
-# Session Recorder
+# SessionLens
 
 A small Windows app. Press **Record**, and Google Chrome opens. Use any website normally,
 then press **Stop and save**, or just close Chrome. One zip lands in your Downloads folder
@@ -6,6 +6,7 @@ with everything that happened:
 
 - every click, form fill, key and page load, with stable selectors
 - the full page HTML before and after each action, including typed values and shadow DOM
+- every DOM change between actions (toasts and confirmation panels that vanish are kept)
 - a screenshot after each action
 - every network request and response of every tab and iframe, bodies included (HAR)
 - console messages and page errors
@@ -21,7 +22,7 @@ explains its files.
 
 ## Install
 
-Run `SessionRecorder-Setup-<version>.exe`. There is no admin prompt, because it installs
+Run `SessionLens-Setup-<version>.exe`. There is no admin prompt, because it installs
 for the current user only.
 
 ## First use of a site
@@ -46,9 +47,9 @@ Needs the .NET 10 SDK and Inno Setup 6.
 
 | What | Where |
 |---|---|
-| Recordings | Downloads, `session-recording_<date>_<time>.zip` |
-| Recording browser profile (logins) | `%LocalAppData%\SessionRecorder\ChromeProfile` |
-| Log | `%LocalAppData%\SessionRecorder\session-recorder.log` |
+| Recordings | Downloads, `sessionlens_<date>_<time>.zip` |
+| Recording browser profile (logins) | `%LocalAppData%\SessionLens\ChromeProfile` |
+| Log | `%LocalAppData%\SessionLens\sessionlens.log` |
 
 Uninstalling removes the app, the log and the recording profile. Saved recordings are kept.
 

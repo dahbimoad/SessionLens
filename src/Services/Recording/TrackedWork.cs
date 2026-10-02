@@ -1,4 +1,4 @@
-namespace SessionRecorder.Services.Recording;
+namespace SessionLens.Services.Recording;
 
 /// <summary>
 /// Playwright raises its events synchronously, but reading a body or taking a screenshot

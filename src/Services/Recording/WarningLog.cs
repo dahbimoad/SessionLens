@@ -1,4 +1,4 @@
-namespace SessionRecorder.Services.Recording;
+namespace SessionLens.Services.Recording;
 
 internal sealed record RecordingWarning(DateTimeOffset At, string Message);
 

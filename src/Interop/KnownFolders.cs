@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace SessionRecorder.Interop;
+namespace SessionLens.Interop;
 
 /// <summary>Environment.SpecialFolder has no Downloads entry, so it is read from the shell.</summary>
 public static class KnownFolders

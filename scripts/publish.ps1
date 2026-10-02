@@ -1,10 +1,10 @@
 <#
 .SYNOPSIS
-    Builds the self-contained win-x64 release of Session Recorder into publish\.
+    Builds the self-contained win-x64 release of SessionLens into publish\.
 
 .EXAMPLE
     .\scripts\publish.ps1
-    .\scripts\publish.ps1 -Output "D:\Tools\SessionRecorder"
+    .\scripts\publish.ps1 -Output "D:\Tools\SessionLens"
 #>
 param(
     [string]$Output
@@ -15,9 +15,9 @@ $ErrorActionPreference = "Stop"
 $repo = Split-Path $PSScriptRoot -Parent
 if (-not $Output) { $Output = Join-Path $repo "publish" }
 
-$project = Join-Path $repo "src\SessionRecorder.csproj"
+$project = Join-Path $repo "src\SessionLens.csproj"
 
-Write-Host "Publishing Session Recorder (self-contained, win-x64)..." -ForegroundColor Cyan
+Write-Host "Publishing SessionLens (self-contained, win-x64)..." -ForegroundColor Cyan
 
 # Self-contained so the target machine needs no .NET runtime installed.
 # Not single-file: the Playwright driver (.playwright\node) must sit next to the exe.
@@ -33,7 +33,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "dotnet publish failed with exit code $LASTEXITCODE."
 }
 
-$exe = Join-Path $Output "SessionRecorder.exe"
+$exe = Join-Path $Output "SessionLens.exe"
 if (-not (Test-Path $exe)) {
     throw "Publish finished but $exe is missing."
 }

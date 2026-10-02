@@ -1,6 +1,6 @@
 # Session recording
 
-This zip is one browsing session recorded by Session Recorder (a Windows app that drives
+This zip is one browsing session recorded by SessionLens (a Windows app that drives
 Google Chrome through Playwright). It holds everything the user did and everything the
 pages did in response.
 
@@ -12,6 +12,7 @@ pages did in response.
 | steps.json | Every user action, in order. This is the main timeline. |
 | dom/step-NNNN-before.html | The full page HTML at the moment of the action, before the page reacted. |
 | dom/step-NNNN-after.html | The full page HTML about 1 second after the action. |
+| dom/step-NNNN-changes.json | Every DOM change between this step and the next one in the same frame: nodes added/removed (with their HTML), attribute and text changes, each with a time. Short-lived messages (toasts, confirmation panels) show up here even when the "after" snapshot missed them. |
 | screenshots/step-NNNN.jpg | What the tab looked like at the "after" moment. |
 | network.har | Every HTTP request and response of every tab and iframe, bodies included (HAR 1.2). |
 | console.json | Console messages and uncaught page errors. |
@@ -41,7 +42,8 @@ Each step has these fields:
   - File inputs give the file names.
 - **key**: only on key steps.
 - **url**, **title**, **frameUrl**, **inIframe**, **at** (ISO time).
-- **files**: the paths of this step's snapshots and screenshot.
+- **files**: the paths of this step's snapshots, change log and screenshot.
+- **changeCount** / **droppedChanges**: how many DOM changes followed the step, and how many were left out past the cap of 1000 per step.
 - **note**: present when the "after" snapshot is missing, because the page navigated first.
 
 The HTML snapshots keep what the user typed. Open shadow roots are written as
@@ -71,5 +73,7 @@ inside its parent's snapshot. It has its own steps, with inIframe = true.
 - Secrets that are not under a secret-looking name are NOT removed. For example, a token written inside an HTML page or a script.
 - Bodies that are neither form nor JSON (multipart uploads, XML, plain text) are not scanned.
 - Closed shadow roots (mode "closed") cannot be read, so they are not in the snapshots.
+- Changes inside shadow roots are not in the change logs (they are in the snapshots).
+- Added HTML in a change log is cut at 4000 characters per node.
 - Service-worker requests have no tab number.
 - Response bodies larger than 20 MB are left out. The entry says so in **_bodyError**.

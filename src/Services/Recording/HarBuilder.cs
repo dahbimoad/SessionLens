@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Playwright;
 
-namespace SessionRecorder.Services.Recording;
+namespace SessionLens.Services.Recording;
 
 // HAR 1.2 (http://www.softwareishard.com/blog/har-12-spec/). Fields starting with "_" are
 // custom fields the spec allows; they tie each request to its tab and to the step it followed.
@@ -57,7 +57,7 @@ internal static class HarBuilder
         ["text/", "json", "xml", "javascript", "ecmascript", "x-www-form-urlencoded", "graphql", "svg", "html", "css"];
 
     public static Har Build(IEnumerable<NetworkRecord> records, string recorderVersion) =>
-        new(new HarLog("1.2", new HarCreator("Session Recorder", recorderVersion), [], [.. records.Select(ToEntry)]));
+        new(new HarLog("1.2", new HarCreator("SessionLens", recorderVersion), [], [.. records.Select(ToEntry)]));
 
     private static HarEntry ToEntry(NetworkRecord record)
     {

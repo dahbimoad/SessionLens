@@ -1,7 +1,9 @@
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
-namespace SessionRecorder.Services.Recording;
+namespace SessionLens.Services.Recording;
 
 internal sealed record StepLogSnapshot(JsonArray Steps, IReadOnlyDictionary<string, byte[]> Files);
 
@@ -16,9 +18,17 @@ internal sealed class StepLog
         "The page navigated away or the recording stopped before the settled snapshot. " +
         "The next page-load step of this tab shows what followed.";
 
+    private static readonly JsonSerializerOptions ChangesJsonOptions = new()
+    {
+        WriteIndented = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    };
+
     private readonly Lock _gate = new();
     private readonly List<JsonObject> _steps = [];
     private readonly Dictionary<string, JsonObject> _unsettled = [];
+    private readonly Dictionary<string, JsonObject> _byKey = [];
+    private readonly Dictionary<int, StepChanges> _changes = [];
     private readonly Dictionary<string, byte[]> _files = [];
 
     /// <summary>0 until the first step, so requests and console entries can say which step they followed.</summary>
@@ -43,6 +53,22 @@ internal sealed class StepLog
 
             _steps.Add(step);
             _unsettled[stepKey] = step;
+            _byKey[stepKey] = step;
+        }
+    }
+
+    /// <summary>Appends one chunk of the DOM changes that followed a step.</summary>
+    public void AddChanges(string stepKey, JsonArray changes, int dropped)
+    {
+        lock (_gate)
+        {
+            if (!_byKey.TryGetValue(stepKey, out var step))
+                throw new InvalidOperationException($"DOM changes for unknown step {stepKey}.");
+
+            var index = step["index"]!.GetValue<int>();
+            if (!_changes.TryGetValue(index, out var log)) _changes[index] = log = new StepChanges();
+            foreach (var change in changes) log.Entries.Add(change?.DeepClone());
+            log.Dropped += dropped;
         }
     }
 
@@ -70,14 +96,30 @@ internal sealed class StepLog
         lock (_gate)
         {
             var steps = new JsonArray();
+            var files = new Dictionary<string, byte[]>(_files);
             foreach (var step in _steps)
             {
                 var copy = step.DeepClone().AsObject();
                 if (_unsettled.ContainsValue(step)) copy["note"] = UnsettledNote;
+                AddChangesFile(copy, files);
                 steps.Add(copy);
             }
-            return new StepLogSnapshot(steps, new Dictionary<string, byte[]>(_files));
+            return new StepLogSnapshot(steps, files);
         }
+    }
+
+    // Written at save time: changes keep arriving until the next step, so the file is never final before then.
+    private void AddChangesFile(JsonObject step, Dictionary<string, byte[]> files)
+    {
+        var index = step["index"]!.GetValue<int>();
+        if (!_changes.TryGetValue(index, out var log)) return;
+
+        var path = $"dom/{StepName(index)}-changes.json";
+        var content = new JsonObject { ["step"] = index, ["dropped"] = log.Dropped, ["changes"] = log.Entries.DeepClone() };
+        files[path] = Encoding.UTF8.GetBytes(content.ToJsonString(ChangesJsonOptions));
+        step["files"]!["changes"] = path;
+        step["changeCount"] = log.Entries.Count;
+        if (log.Dropped > 0) step["droppedChanges"] = log.Dropped;
     }
 
     private string AddFile(string path, byte[] content)
@@ -87,4 +129,10 @@ internal sealed class StepLog
     }
 
     private static string StepName(int index) => $"step-{index:D4}";
+
+    private sealed class StepChanges
+    {
+        public JsonArray Entries { get; } = [];
+        public int Dropped { get; set; }
+    }
 }
