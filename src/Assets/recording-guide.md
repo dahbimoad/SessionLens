@@ -43,7 +43,7 @@ Each step has these fields:
 - **key**: only on key steps.
 - **url**, **title**, **frameUrl**, **inIframe**, **at** (ISO time).
 - **files**: the paths of this step's snapshots, change log and screenshot.
-- **changeCount** / **droppedChanges**: how many DOM changes followed the step, and how many were left out past the cap of 1000 per step.
+- **changeCount** / **droppedChanges**: how many DOM changes followed the step, and how many were left out past the caps (2000 node/text changes and 1000 attribute changes per step). Attribute changes on SVG elements (chart animations) and changes to elements not yet in the page are not logged.
 - **note**: present when the "after" snapshot is missing, because the page navigated first.
 
 The HTML snapshots keep what the user typed. Open shadow roots are written as

@@ -20,7 +20,10 @@
   const RAW_TEXT_ELEMENTS = new Set(['script', 'style']);
   const URL_ATTRIBUTES = ['href', 'src', 'action'];
   const CHANGE_FLUSH_MS = 2000;
-  const MAX_CHANGES_PER_STEP = 1000;
+  // Separate budgets: animation churn on attributes must not use up the room for added
+  // nodes and text, which is where confirmation messages appear.
+  const MAX_STRUCTURE_CHANGES_PER_STEP = 2000;
+  const MAX_ATTRIBUTE_CHANGES_PER_STEP = 1000;
   const CHANGE_HTML_LENGTH = 4000;
   const isTopFrame = window === window.top;
 
@@ -29,7 +32,8 @@
   const changeObserver = new MutationObserver(onMutations);
   let changeStepKey = null;
   let pendingChanges = [];
-  let changesInStep = 0;
+  let structureChangesInStep = 0;
+  let attributeChangesInStep = 0;
   let droppedChanges = 0;
   let flushTimer = null;
 
@@ -97,19 +101,23 @@
       });
     }
     changeStepKey = stepKey;
-    changesInStep = 0;
+    structureChangesInStep = 0;
+    attributeChangesInStep = 0;
   }
 
   function onMutations(records) {
     for (const record of records) {
-      if (changesInStep >= MAX_CHANGES_PER_STEP) {
+      if (isNoise(record)) continue;
+      const isAttribute = record.type === 'attributes';
+      if (isAttribute ? attributeChangesInStep >= MAX_ATTRIBUTE_CHANGES_PER_STEP : structureChangesInStep >= MAX_STRUCTURE_CHANGES_PER_STEP) {
         droppedChanges++;
         continue;
       }
       const change = describeMutation(record);
       if (!change) continue;
       pendingChanges.push(change);
-      changesInStep++;
+      if (isAttribute) attributeChangesInStep++;
+      else structureChangesInStep++;
     }
     if (pendingChanges.length > 0 || droppedChanges > 0) flushTimer ??= setTimeout(flushChanges, CHANGE_FLUSH_MS);
   }
@@ -123,6 +131,13 @@
     report(JSON.stringify({ type: 'changes', stepKey: changeStepKey, changes: pendingChanges, dropped: droppedChanges }));
     pendingChanges = [];
     droppedChanges = 0;
+  }
+
+  // Changes nobody sees: trees still being built off-document (they are logged once, when
+  // inserted) and chart animations on SVG attributes.
+  function isNoise(record) {
+    if (!record.target.isConnected) return true;
+    return record.type === 'attributes' && record.target instanceof SVGElement;
   }
 
   function describeMutation(record) {

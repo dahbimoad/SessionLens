@@ -5,7 +5,7 @@
 ; non-technical user never sees an admin prompt, and the recorded Chrome runs as them.
 
 #define AppName        "SessionLens"
-#define AppVersion     "1.0.0"
+#define AppVersion     "1.0.1"
 #define AppPublisher   "iSoutien"
 #define AppCopyright   "Copyright (c) 2026 Moad Dahbi"
 #define AppExeName     "SessionLens.exe"
